@@ -20,8 +20,8 @@ createRoot(document.getElementById('root')).render(
 
     <Route path='/auth' element={<AuthLayout />}>
     {/* <Route path="/auth" element={<AuthLayout />} /> */}
-    <Route path="signUp" element={<SignUp />} />
   </Route>
+    <Route path="/signUp" element={<SignUp />} />
     {/* <Route path="register" element={<Register />} /> */}
 
     {/* <Route path="" element={<Home />} />  */}

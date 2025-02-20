@@ -1,7 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
-import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/firebase.config";
+import Swal from "sweetalert2";
 
 
 export const AuthContext = createContext(null);
@@ -10,14 +11,36 @@ const AuthProvider = ({children}) => {
     const [user,setUser] = useState(null)
 
     const newUser = (email, password) =>{
+        setLoading(true)
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
     const updateUserProfile = (updateData) =>{
         // console.log(updateData)
+        setLoading(true)
         return updateProfile(auth.currentUser, updateData)
     }
 
+     // login user
+     const loginUser = (email, password)=>{
+        setLoading(true)
+       return signInWithEmailAndPassword(auth, email, password)
+    }
+
+     // logout User
+     const handleLogout=()=>{
+        setLoading(true)
+        signOut(auth).then((res) => {
+            console.log(res)
+            Swal.fire({
+                title: "sign out",
+                text: "You are successfully sign out",
+                icon: "success"
+              });
+          }).catch((error) => {
+            console.log(error)
+          });
+    }
 
     // onauth
     useEffect(() => {
@@ -39,7 +62,9 @@ const AuthProvider = ({children}) => {
         loading,
         setLoading,
         updateUserProfile,
-        user,setUser
+        user,setUser,
+        handleLogout,
+        loginUser
     }
   return (
     <div>
