@@ -9,6 +9,7 @@ import MainLayout from './Layout/MainLayout';
 import SignUp from './components/signUp/SignUp';
 import AuthLayout from './Layout/AuthLayout';
 import PrivateRoutes from './privateRoutes/PrivateRoutes';
+import SignIn from './components/signIn/SignIn';
 // import AuthLayout from './Layout/AuthLayout';
 
 createRoot(document.getElementById('root')).render(
@@ -22,8 +23,8 @@ createRoot(document.getElementById('root')).render(
     {/* <Route path="/auth" element={<AuthLayout />} /> */}
   </Route>
     <Route path="/signUp" element={<SignUp />} />
-    {/* <Route path="register" element={<Register />} /> */}
-
+    <Route path="/signIn" element={<SignIn />} />
+   
     {/* <Route path="" element={<Home />} />  */}
       <Route element={<PrivateRoutes><MainLayout /></PrivateRoutes>} >
       <Route path="/" element={<Home />} />

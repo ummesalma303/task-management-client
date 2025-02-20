@@ -1,12 +1,16 @@
 // import React from 'react'
 import { Input } from '@/components/ui/input';
+import useAxiosPublic from '@/hooks/useAxiosPublic';
 import { AuthContext } from '@/providers/AuthProvider';
 import { useContext } from 'react';
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
+import SocialLogin from '../socialLogin/SocialLogin';
 // import { Link} from 'react-router-dom';
 
 export default function SignUp() {
+  const axiosPublic = useAxiosPublic()
     const navigate = useNavigate()
     const {newUser,updateUserProfile} = useContext(AuthContext)
     const {
@@ -25,10 +29,35 @@ export default function SignUp() {
                 photoURL: data?.photo
             }
             updateUserProfile(updateData)
-        navigate('/')
+
+            axiosPublic.post('/user',data)
+            .then(res=>{
+              console.log(res)
+              if (res.data.insertedId) {
+                Swal.fire({
+                  title: "Success",
+                  text: "user successfully Sign Up",
+                  icon: "success",
+                  // timer: 1000
+                });
+                navigate('/')
+              }
+            }
+            )
+            
+       
         })
-        .catch(err=>console.log(err))
-        console.log(data)
+        .catch(err=>{
+           Swal.fire({
+                    title: "Error",
+                    text:`${err?.message}`,
+                    icon: "success",
+                    // timer: 1000
+                  });
+                  // console.log(err)
+          console.log(err)
+        })
+        // console.log(data)
       }
   return (
     <div className='py-24 flex flex-col justify-center items-center '>
@@ -69,6 +98,7 @@ export default function SignUp() {
 <input className='bg-black px-4 py-1 w-full rounded-md text-white mb-3' type="submit" value='register' />
 </form>
 <div className="divide-x-2 ">
+  <SocialLogin></SocialLogin>
 </div>
     </div>
 

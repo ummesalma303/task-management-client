@@ -17,7 +17,7 @@ const AuthProvider = ({children}) => {
 
     const updateUserProfile = (updateData) =>{
         // console.log(updateData)
-        setLoading(true)
+        // setLoading(true)
         return updateProfile(auth.currentUser, updateData)
     }
 
@@ -42,6 +42,11 @@ const AuthProvider = ({children}) => {
           });
     }
 
+     //login with google
+     const googleLoginUser =()=>{
+      return signInWithPopup(auth, provider)
+  }
+
     // onauth
     useEffect(() => {
        const subscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -64,7 +69,8 @@ const AuthProvider = ({children}) => {
         updateUserProfile,
         user,setUser,
         handleLogout,
-        loginUser
+        loginUser,
+        googleLoginUser
     }
   return (
     <div>
