@@ -11,9 +11,18 @@ import AuthLayout from './Layout/AuthLayout';
 import PrivateRoutes from './privateRoutes/PrivateRoutes';
 import SignIn from './components/signIn/SignIn';
 // import AuthLayout from './Layout/AuthLayout';
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+     <QueryClientProvider client={queryClient}>
+
     <AuthProvider>
     <BrowserRouter>
     <Routes>
@@ -33,5 +42,6 @@ createRoot(document.getElementById('root')).render(
     </Routes>
     </BrowserRouter>
     </AuthProvider>
+     </QueryClientProvider>
   </StrictMode>,
 )

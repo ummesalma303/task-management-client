@@ -1,11 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/firebase.config";
 import Swal from "sweetalert2";
 
 
 export const AuthContext = createContext(null);
+const provider = new GoogleAuthProvider();
+
 const AuthProvider = ({children}) => {
     const [loading,setLoading] = useState(true)
     const [user,setUser] = useState(null)

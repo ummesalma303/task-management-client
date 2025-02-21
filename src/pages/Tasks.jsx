@@ -1,4 +1,5 @@
 // import React from 'react'
+import Column from "@/components/column/Column"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,11 +13,18 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import useAxiosPublic from "@/hooks/useAxiosPublic"
+import { AuthContext } from "@/providers/AuthProvider"
+import { closestCenter, closestCorners, DndContext } from "@dnd-kit/core"
 import { DialogClose } from "@radix-ui/react-dialog"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useContext, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import Swal from "sweetalert2"
 
 export default function Tasks() {
+  const [task,setTask] = useState([])
+    const {user} = useContext(AuthContext);
+    const queryClient = useQueryClient(); 
     const axiosPublic = useAxiosPublic()
     const {
         register,
@@ -25,9 +33,9 @@ export default function Tasks() {
         handleSubmit,
       } = useForm()
     const onSubmit = (data) =>{
-        const tasks = {...data,Timestamp:new Date()}
+        const tasks = {...data,Timestamp:new Date(),email: user?.email, image: user?.photoURL}
         console.log(tasks)
-
+// post tasks
         axiosPublic.post('/tasks',tasks)
         .then(res=>{
           console.log(res)
@@ -38,6 +46,7 @@ export default function Tasks() {
                               icon: "success",
                               // timer: 1000
                             });
+                            queryClient.invalidateQueries(["tasks"]);
           }})
           .catch(err => {
              Swal.fire({
@@ -50,11 +59,38 @@ export default function Tasks() {
                       console.log(err)
           })
     }
+
+      const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ["tasks", user],
+    queryFn: async () => {
+      const res = await axiosPublic.get("/tasks");
+      console.log(res)
+      return res.data;
+    },
+  });
+  
+useEffect(()=>{
+  setTask(task)
+},[task])
+console.log(task)
+  if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
+  console.log(tasks)
+  
+// const onDragEnd = e =>{
+//   console.log('ondrag',e)
+// }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 my-8 w-11/12 mx-auto">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 my-8 w-11/12 mx-auto">
         <div className="">
       <h2 className="font-semibold text-2xl pb-2 border-b-2">To-Do</h2>
 
+      <DndContext collisionDetection={closestCenter}>
+
+<Column tasks={tasks}/>
+      </DndContext>
       {/* add task */}
 <div  className="pt-2">  
 <Dialog>
