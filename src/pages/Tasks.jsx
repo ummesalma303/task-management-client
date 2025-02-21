@@ -1,6 +1,28 @@
-// import React from 'react'
-import Column from "@/components/column/Column"
-import { Button } from "@/components/ui/button"
+// // import React from 'react'
+// import Column from "@/components/column/Column"
+// import { Button } from "@/components/ui/button"
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import useAxiosPublic from "@/hooks/useAxiosPublic"
+// import { AuthContext } from "@/providers/AuthProvider"
+// import { closestCenter, closestCorners, DndContext } from "@dnd-kit/core"
+// import { DialogClose } from "@radix-ui/react-dialog"
+// import { useQuery, useQueryClient } from "@tanstack/react-query"
+// import { useContext, useEffect, useState } from "react"
+// import { useForm } from "react-hook-form"
+// import Swal from "sweetalert2"
+
+import Column from "@/components/column/Column";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +31,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import useAxiosPublic from "@/hooks/useAxiosPublic"
-import { AuthContext } from "@/providers/AuthProvider"
-import { closestCenter, closestCorners, DndContext } from "@dnd-kit/core"
-import { DialogClose } from "@radix-ui/react-dialog"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useContext, useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import Swal from "sweetalert2"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import useAxiosPublic from "@/hooks/useAxiosPublic";
+import { AuthContext } from "@/providers/AuthProvider";
+import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 
 export default function Tasks() {
   const [task,setTask] = useState([])
@@ -64,32 +87,105 @@ export default function Tasks() {
     queryKey: ["tasks", user],
     queryFn: async () => {
       const res = await axiosPublic.get("/tasks");
-      console.log(res)
+      // console.log(res)
       return res.data;
     },
   });
   
 useEffect(()=>{
-  setTask(task)
-},[task])
+  setTask(tasks)
+},[tasks])
 console.log(task)
   if (isLoading) {
     return <h2>Loading...</h2>;
   }
   console.log(tasks)
+
+
+
+//   const getPos = id => task.findIndex((obj)=>obj._id === id)
+// const onDragEnd = (event) => {
+//   const { active, over } = event;
+//   console.log("Active ID:", active.id);
+//   console.log("Over ID:", over?.id);
+
+//   if ( active.id === over.id) {
+//     return;
+//   }
+ 
+
+//   setTask(() => {
+//     const originalPos = getPos(active.id)
+//      const latestPos = getPos(over.id)
+
+//     return arrayMove(task, originalPos,latestPos);
+//   });
+//     // setTask((prevTasks) => {
+//     //   const oldIndex = prevTasks.findIndex(task => task._id === active.id);
+//     //   const newIndex = prevTasks.findIndex(task => task._id === over.id);
   
-// const onDragEnd = e =>{
-//   console.log('ondrag',e)
+//     //   if (oldIndex === -1 || newIndex === -1) return prevTasks; 
+  
+//     //   const reorderedTasks = arrayMove([...prevTasks], oldIndex, newIndex);
+  
+//     //   // Extract only task IDs in the new order to send to the backend
+//     // const reorderedTaskIds = reorderedTasks.map((task) => task._id);
+
+//     //   axiosPublic.put('/reorder', reorderedTaskIds)
+//     //     .then(res =>{
+          
+//     //       console.log("Updated order:", res.data)
+//     //       queryClient.invalidateQueries(["tasks"]);
+//     //     // refetch()
+//     //     })
+//     //     .catch(err => console.log("Error:", err));
+  
+//     //   return reorderedTasks;
+//     // });
+
+    
 // }
+
+const onDragEnd = (event) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
+
+
+   setTask((prevTasks) => {
+      const oldIndex = prevTasks.findIndex(task => task._id === active.id);
+      const newIndex = prevTasks.findIndex(task => task._id === over.id);
+  
+      if (!over || oldIndex === -1 || newIndex === -1) return prevTasks; 
+  
+      const reorderedTasks = arrayMove([...prevTasks], oldIndex, newIndex);
+  
+      const reorderedTaskIds = reorderedTasks.map((task) => task._id);
+      console.log(reorderedTaskIds)
+      axiosPublic.put('/reorder', {reorderedTaskIds})
+        .then(res =>{
+          
+          console.log("Updated order:", res.data)
+          queryClient.invalidateQueries(["tasks"]);
+        // refetch()
+        })
+        .catch(err => console.log("Error:", err));
+  
+      return reorderedTasks;
+    });
+
+};
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 my-8 w-11/12 mx-auto">
         <div className="">
       <h2 className="font-semibold text-2xl pb-2 border-b-2">To-Do</h2>
 
-      <DndContext collisionDetection={closestCenter}>
+      <DndContext collisionDetection={closestCorners} onDragEnd={onDragEnd}>
 
-<Column tasks={tasks}/>
+      <div >
+      
+<Column tasks={task}/>
+      </div>
       </DndContext>
       {/* add task */}
 <div  className="pt-2">  

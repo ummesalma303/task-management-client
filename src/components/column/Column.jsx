@@ -28,7 +28,7 @@ const { data: tasks = [], isLoading } = useQuery({
   console.log(tasks)
   return (
     <div className="mt-6 space-y-4 ">
-           <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
+           <SortableContext items={tasks.map(task=>task._id)} strategy={verticalListSortingStrategy}>
       {
        tasks?.map(task => (
            <Task key={task._id} id={task._id} task={task}/>
