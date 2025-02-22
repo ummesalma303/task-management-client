@@ -21,7 +21,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import Column2 from "./Column2";
+import Column2 from "../components/column/Column2";
 import Column3 from "@/components/column/Column3";
 // import Column2 from "./Column2";
 
@@ -46,7 +46,7 @@ export default function Tasks() {
           if (res.data.insertedId) {
              Swal.fire({
                               title: "Success",
-                              text: "user successfully Sign Up",
+                              text: "Task successfully added",
                               icon: "success",
                               // timer: 1000
                             });

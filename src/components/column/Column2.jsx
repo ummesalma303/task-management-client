@@ -12,7 +12,7 @@ export default function Column2({tasks}) {
            <SortableContext items={tasks.map(task=>task._id)} strategy={verticalListSortingStrategy}>
      
 {
-            tasks?.filter(task=>task.category === 'In Progres')
+            tasks?.filter(task=>task.category === 'In Progress')
             .map(task=> <Task key={task._id} id={task._id} task={task}/>)
            }
 
