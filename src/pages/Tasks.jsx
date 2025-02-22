@@ -1,4 +1,3 @@
-
 import Column from "@/components/column/Column";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useAxiosPublic from "@/hooks/useAxiosPublic";
 import { AuthContext } from "@/providers/AuthProvider";
-import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
@@ -23,10 +20,12 @@ import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import Column2 from "../components/column/Column2";
 import Column3 from "@/components/column/Column3";
+import { ReactSortable } from "react-sortablejs";
 // import Column2 from "./Column2";
 
 export default function Tasks() {
-  // const [task,setTask] = useState([])
+  const [activeCard,setActiveCard] = useState(null)
+  console.log(activeCard)
     const {user} = useContext(AuthContext);
     const queryClient = useQueryClient(); 
     const axiosPublic = useAxiosPublic()
@@ -72,158 +71,30 @@ export default function Tasks() {
       return res.data;
     },
   });
-  
-// useEffect(()=>{
-//   setTask(tasks)
-// },[tasks])
+ 
 // console.log(task)
   if (isLoading) {
     return <h2>Loading...</h2>;
   }
   console.log(tasks)
 
-
-
-//   const getPos = id => task.findIndex((obj)=>obj._id === id)
-// const onDragEnd = (event) => {
-//   const { active, over } = event;
-//   console.log("Active ID:", active.id);
-//   console.log("Over ID:", over?.id);
-
-//   if ( active.id === over.id) {
-//     return;
-//   }
- 
-
-//   setTask(() => {
-//     const originalPos = getPos(active.id)
-//      const latestPos = getPos(over.id)
-
-//     return arrayMove(task, originalPos,latestPos);
-//   });
-//     // setTask((prevTasks) => {
-//     //   const oldIndex = prevTasks.findIndex(task => task._id === active.id);
-//     //   const newIndex = prevTasks.findIndex(task => task._id === over.id);
-  
-//     //   if (oldIndex === -1 || newIndex === -1) return prevTasks; 
-  
-//     //   const reorderedTasks = arrayMove([...prevTasks], oldIndex, newIndex);
-  
-//     //   // Extract only task IDs in the new order to send to the backend
-//     // const reorderedTaskIds = reorderedTasks.map((task) => task._id);
-
-//     //   axiosPublic.put('/reorder', reorderedTaskIds)
-//     //     .then(res =>{
-          
-//     //       console.log("Updated order:", res.data)
-//     //       queryClient.invalidateQueries(["tasks"]);
-//     //     // refetch()
-//     //     })
-//     //     .catch(err => console.log("Error:", err));
-  
-//     //   return reorderedTasks;
-//     // });
-
-    
-// }
-
-// const onDragEnd = (event) => {
-//   const { active, over } = event;
-//   if (!over || active.id === over.id) return;
-
-
-//    setTask((prevTasks) => {
-//       const oldIndex = prevTasks.findIndex(task => task._id === active.id);
-//       const newIndex = prevTasks.findIndex(task => task._id === over.id);
-  
-//       if (!over || oldIndex === -1 || newIndex === -1) return prevTasks; 
-  
-//       const reorderedTasks = arrayMove([...prevTasks], oldIndex, newIndex);
-//   console.log(reorderedTasks)
-//       const reorderedTaskIds = reorderedTasks.map((task) => task._id);
-//       console.log(reorderedTaskIds)
-//       // axiosPublic.put('/reorder', {reorderedTaskIds})
-//       //   .then(res =>{
-          
-//       //     console.log("Updated order:", res.data)
-//       //     queryClient.invalidateQueries(["tasks"]);
-//       //   // refetch()
-//       //   })
-//       //   .catch(err => console.log("Error:", err));
-//   // setTask(reorderedTasks)
-//       return reorderedTasks;
-//     });
-
-// };
-// console.log(task)
-
-const onDragEnd = (event) => {
-  const { active, over } = event;
-  if (!over || active.id === over.id) return; // No change if dropped on the same spot
-
-  // Find old and new index based on task _id
-  const oldIndex = tasks.findIndex(task => task._id === active.id);
-  const newIndex = tasks.findIndex(task => task._id === over.id);
-
-  if (oldIndex === -1 || newIndex === -1) return; // Safety check for invalid positions
-
-  // Reorder tasks in frontend state
-  const reorderedTasks = arrayMove([...tasks], oldIndex, newIndex);
-  
-  console.log("Reordered tasks:", reorderedTasks);
-
-  // Update task order in the backend
-  axiosPublic.put("/reorder", { reorderedTasks })
-    .then(res => {
-      console.log("Order updated in backend:", res.data);
-      // Invalidate the query to refetch the updated task list
-      queryClient.invalidateQueries(["tasks"]);
-    })
-    .catch(err => {
-      console.error("Error updating task order:", err);
-      Swal.fire({
-        title: "Error",
-        text: `Failed to reorder tasks. Please try again.`,
-        icon: "error",
-      });
-    });
-};
-
-// const onDragEnd = (event) => {
-//   const { active, over } = event;
-//   if (!over || active.id === over.id) return;
-
-//   setTask((prevTasks) => {
-//     const oldIndex = prevTasks.findIndex(task => task._id === active.id);
-//     const newIndex = prevTasks.findIndex(task => task._id === over.id);
-    
-//     if (oldIndex === -1 || newIndex === -1) return prevTasks;
-
-//     const reorderedTasks = arrayMove([...prevTasks], oldIndex, newIndex);
-    
-//     console.log("Reordered tasks:", reorderedTasks);
-
-//     return reorderedTasks; 
-//   });
-// };
-// console.log(task)
-
+  const onDrop = (order) =>{
+    console.log(`${activeCard} is going to place --- at the position ${order}`)
+  }
   return (
+  
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 my-8 w-11/12 mx-auto">
         <div className="">
       <h2 className="font-semibold text-2xl pb-2 border-b-2">To-Do</h2>
 
-      {/* <DndContext collisionDetection={closestCorners} onDragEnd={onDragEnd}> */}
-
+      
       <div >
-      {/* {
-        tasks.filter(task =>task.category === 'To-Do' && <Column tasks={task}/>)
-      } */}
+      
 
-      <Column tasks={tasks} refetch={refetch} />
+      <Column tasks={tasks} refetch={refetch} setActiveCard={setActiveCard} onDrop={onDrop} />
 
       </div>
-      {/* </DndContext> */}
+     
       {/* add task */}
 <div  className="pt-2">  
 <Dialog>
@@ -281,32 +152,31 @@ const onDragEnd = (event) => {
         </div>
         <div className="">
       <h2 className="font-semibold text-2xl pb-2 border-b-2">In Progress</h2>
-      {/* <DndContext collisionDetection={closestCorners} onDragEnd={onDragEnd}> */}
-
+     
       <div >
-      {/* {
-        tasks.filter(task =>task.category === 'To-Do' && <Column tasks={task}/>)
-      } */}
+      
 
-      <Column2 tasks={tasks} />
+      <Column2 tasks={tasks} refetch={refetch} setActiveCard={setActiveCard} onDrop={onDrop} />
 
       </div>
-      {/* </DndContext> */}
+     
         </div>
         <div className="">
       <h2 className="font-semibold text-2xl pb-2 border-b-2">Done</h2>
-      {/* <DndContext collisionDetection={closestCorners} onDragEnd={onDragEnd}> */}
+     
 
 <div >
-{/* {
-  tasks.filter(task =>task.category === 'To-Do' && <Column tasks={task}/>)
-} */}
 
-<Column3 tasks={tasks} />
+
+<Column3 tasks={tasks} refetch={refetch} setActiveCard={setActiveCard} onDrop={onDrop} />
 
 </div>
-{/* </DndContext> */}
+
         </div>
+<h1> Active card _ {activeCard}</h1>
     </div>
+
   )
 }
+
+
